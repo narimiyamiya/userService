@@ -6,16 +6,38 @@ import io.getarrays.userservice.repo.RoleRepo;
 import io.getarrays.userservice.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service @RequiredArgsConstructor @Transactional @Slf4j
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepo userRepo;
     private final RoleRepo roleRepo;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepo.findByUserName(username);
+        if (user == null){
+            log.error("查無此帳號");
+            throw new UsernameNotFoundException("查無此帳號");
+        }else{
+            log.info("帳號已被搜尋到:{}", username);
+        }
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        user.getRoles().forEach(role -> {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
+        });
+        return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(), authorities);
+    }
 
     @Override
     public User saveUser(User user) {
@@ -48,4 +70,6 @@ public class UserServiceImpl implements UserService{
         log.info("Fetching all users ()");
         return userRepo.findAll();
     }
+
+
 }
