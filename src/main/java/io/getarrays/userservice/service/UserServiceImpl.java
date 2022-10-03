@@ -26,13 +26,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepo.findByUserName(username);
+    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+        User user = userRepo.findByUserName(userName);
         if (user == null){
             log.error("查無此帳號");
             throw new UsernameNotFoundException("查無此帳號");
         }else{
-            log.info("帳號已被搜尋到:{}", username);
+            log.info("帳號已被搜尋到:{}", userName);
         }
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         user.getRoles().forEach(role -> {
@@ -63,9 +63,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User getUser(String username) {
-        log.info("Fetching user {}", username);
-        return userRepo.findByUserName(username);
+    public User getUser(String userName) {
+        log.info("Fetching user {}", userName);
+        return userRepo.findByUserName(userName);
     }
 
     @Override
