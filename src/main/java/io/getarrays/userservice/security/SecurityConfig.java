@@ -38,7 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         /**覆蓋UsernamePasswordAuthenticationFilter 中 自帶的 login 順序很重要 角色弱->角色強**/
-        http.authorizeRequests().antMatchers("/api/login/**").permitAll();
+        http.authorizeRequests().antMatchers("/api/login/**","api/token/refresh?**").permitAll();
         http.authorizeRequests().antMatchers(GET,"api/user/**").hasAnyAuthority("ROLE_USER");
         http.authorizeRequests().antMatchers(POST,"api/user/save/**").hasAnyAuthority("ROLE_ADMIN");
         http.authorizeRequests().anyRequest().authenticated();
